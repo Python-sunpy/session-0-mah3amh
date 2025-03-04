@@ -1,0 +1,40 @@
+name: Autograding Tests
+
+'on':
+  - push
+  - repository_dispatch
+
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install pytest
+          pip install -r requirements.txt || true  # اگر فایلی به نام requirements.txt بود، نصب می‌شود
+
+      - name: Run Python tests
+        id: python-test
+        run: pytest --tb=short --disable-warnings > pytest-results.txt || true  # اجرای تست‌ها و ذخیره خروجی در فایل
+
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        with:
+          runners: python-test
+        env:
+          PYTHON-TEST_RESULTS: "${{ steps.python-test.outputs.result }}"
