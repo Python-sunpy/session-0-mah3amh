@@ -39,5 +39,7 @@ jobs:
         uses: classroom-resources/autograding-grading-reporter@v1
         with:
           runners: python-test
+          timeout: 10
+          max-score: 20
         env:
           PYTHON-TEST_RESULTS: "${{ env.PYTHON_TEST_RESULTS }}"
